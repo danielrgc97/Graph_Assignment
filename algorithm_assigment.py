@@ -5,7 +5,7 @@ class MyClass(object):
     def __init__(self):
         # Extracting values from the file
         lines = []
-        f = open("./data_cases/case_06.in", "r")
+        f = open("./data_cases/case_04.in", "r")
         lines = f.readlines()
         self.first_line = [int(i) for i in lines[0].split(" ")]
         self.links = np.zeros([self.first_line[0],2])
@@ -17,27 +17,65 @@ class MyClass(object):
         self.blues_line = [int(i) for i in lines[len(lines)-1].split(" ")]
 
         # Variables for the algorithm
+        self.orderedBuffer = 0
         self.link_ways = 0
         self.link_states = 0
         self.flagRB = True
         self.toRemove = []
         self.waysNumber = 1
+        self.tamOriginal = self.first_line[0]
 
     # Functions
     def graphWaysConstruction(self):
-        self.link_ways = (np.zeros([self.first_line[0],4]) - 1)
+        
+        self.orderedBuffer = (np.zeros([self.tamOriginal + 1, 3]) - 1)
+        self.link_ways = (np.zeros([self.first_line[0],4]))
+
         for i in range(0,self.first_line[0]):
-            for j in range(0,self.first_line[0]):
-                if i != j:
-                    x = 0.1
-                    if self.links[i,0] == self.links[j,0] or self.links[i,0] == self.links[j,1]:
-                        if self.links[i,0] == self.links[j,1]: x = 0.2
-                        if self.link_ways[i,0] == -1 : self.link_ways[i,0] = j + x
-                        elif self.link_ways[i,1] == -1 : self.link_ways[i,1] = j + x
-                    if self.links[i,1] == self.links[j,0] or self.links[i,1] == self.links[j,1]:
-                        if self.links[i,1] == self.links[j,1]: x = 0.2
-                        if self.link_ways[i,2] == -1 : self.link_ways[i,2] = j + x
-                        elif self.link_ways[i,3] == -1 : self.link_ways[i,3] = j + x
+            num1 = int(self.links[i,0])
+            num2 = int(self.links[i,1])
+            pos = 0
+            while(self.orderedBuffer[num1 - 1, pos] != -1):
+                pos +=1
+            self.orderedBuffer[num1 - 1,pos] = i + 0.1
+            pos = 0
+            while(self.orderedBuffer[num2 - 1, pos] != -1):
+                pos +=1
+            self.orderedBuffer[num2 - 1,pos] = i + 0.2
+        
+        for i in range(0,self.first_line[0]):
+            line = self.orderedBuffer[int(self.links[i,0] - 1)]
+            j = 0
+            while(len(line)>2):
+                if line[j] == i + 0.1 :
+                    line = np.delete(line,j)
+                j += 1
+            self.link_ways[i,0] = line[0]
+            self.link_ways[i,1] = line[1]
+
+            line = self.orderedBuffer[int(self.links[i,1] - 1)]
+            j = 0
+            while(len(line)>2):
+                if line[j] == i + 0.2 :
+                    line = np.delete(line,j)
+                j += 1
+            self.link_ways[i,2] = line[0]
+            self.link_ways[i,3] = line[1]
+
+
+        # self.link_ways = (np.zeros([self.first_line[0],4]) - 1)
+        # for i in range(0,self.first_line[0]):
+        #     for j in range(0,self.first_line[0]):
+        #         if i != j:
+        #             x = 0.1
+        #             if self.links[i,0] == self.links[j,0] or self.links[i,0] == self.links[j,1]:
+        #                 if self.links[i,0] == self.links[j,1]: x = 0.2
+        #                 if self.link_ways[i,0] == -1 : self.link_ways[i,0] = j + x
+        #                 elif self.link_ways[i,1] == -1 : self.link_ways[i,1] = j + x
+        #             if self.links[i,1] == self.links[j,0] or self.links[i,1] == self.links[j,1]:
+        #                 if self.links[i,1] == self.links[j,1]: x = 0.2
+        #                 if self.link_ways[i,2] == -1 : self.link_ways[i,2] = j + x
+        #                 elif self.link_ways[i,3] == -1 : self.link_ways[i,3] = j + x
     def linkStatesCalculation(self):
         self.link_states = np.zeros([self.first_line[0],4])
         self.flagRB = True
@@ -86,7 +124,6 @@ class MyClass(object):
                 if np.any(self.link_states[int(link3)] == 0) and np.any(self.link_states[int(link4)] == 0):
                     self.toRemove.append(i+0.1)
                     self.waysNumber += 1
-        print("{} paths found".format(len(self.toRemove)))
         if len(self.toRemove) > 0: self.cutGraph()
         return 0 < len(self.toRemove)
     def cutGraph(self):
@@ -121,7 +158,6 @@ class MyClass(object):
 a = MyClass()
 morePathsToFind = True 
 while(morePathsToFind == True):
-    print("Iteration:")
     a.graphWaysConstruction()
     a.linkStatesCalculation()
     morePathsToFind = a.findPaths()
