@@ -36,6 +36,7 @@ class MyClass(object):
         # This function creates 2 matrices, one to save the information of the links in
         # an ordered matrix to spend less time searching "orderedBuffer", and another in which it saves for
         # each link the possible other 4 links to which it connects "link_ways".
+        # The general purpose of creating these matrices is to navigate through the graph more efficiently.
         self.orderedBuffer = (np.zeros([self.originalSize + 1, 3]) - 1)
         self.link_ways = (np.zeros([self.first_line[0],4]))
 
@@ -71,12 +72,12 @@ class MyClass(object):
                 j += 1
             self.link_ways[i,2] = line[0]
             self.link_ways[i,3] = line[1]
-    def linkStatesCalculation(self):
+    def linkStatesCalculation(self): 
         # This function is in charge of determining the state of the links, these states
         # consist of 4 bits, because there are 2 colors and 2 directions. These states allows to
         # know if a specific color can be found in a specific direction. If for example there are
         # both red and blue in both directions of that link, the status of that link will be "1 1 1 1".
-        # This marking starts from each color found in the graph, and it marks all the links recursively.
+        # This states are created from each color found in the graph, and it marks all the links recursively.
         # If a markup process finds links that have already been marked in that color and direction, it stops
         # the markup in that direction.
         self.link_states = np.zeros([self.first_line[0],4])
