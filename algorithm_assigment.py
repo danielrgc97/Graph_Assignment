@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
+import sys
 import numpy as np
 
 class MyClass(object):
     def __init__(self):
         # Importing graph data into the variables "first_line", "links", "reds_line" and "blues_line"
         lines = []
-        f = open("./data_cases/case_06.in", "r")
+        f = open(str(sys.argv[1]), "r")
         lines = f.readlines()
         self.first_line = [int(i) for i in lines[0].split(" ")]
         self.links = np.zeros([self.first_line[0],2])
@@ -28,14 +29,14 @@ class MyClass(object):
         self.flagRB = True
         self.toRemove = []
         self.pathsNumber = 0
-        self.tamOriginal = self.first_line[0]
+        self.originalSize = self.first_line[0]
 
     # Primary functions
     def graphWaysConstruction(self):
         # This function creates 2 matrices, one to save the information of the links in
         # an ordered matrix to spend less time searching "orderedBuffer", and another in which it saves for
         # each link the possible other 4 links to which it connects "link_ways".
-        self.orderedBuffer = (np.zeros([self.tamOriginal + 1, 3]) - 1)
+        self.orderedBuffer = (np.zeros([self.originalSize + 1, 3]) - 1)
         self.link_ways = (np.zeros([self.first_line[0],4]))
 
         # Construction of "orderedBuffer" array
@@ -174,5 +175,3 @@ while(morePathsToFind == True):
     morePathsToFind = a.findPaths()
 
 print("Total number of paths found:",a.pathsNumber)
-
-
